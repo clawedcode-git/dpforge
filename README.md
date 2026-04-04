@@ -33,13 +33,29 @@ curl -fsSL https://ollama.ai/install.sh | sh
 
 ### 2. Pull an Image Generation Model
 
+#### Option A: Local Models (Recommended for offline use)
+
 ```bash
 # Recommended: SDXL Turbo (fast, high quality)
 ollama pull sdxl-turbo
 
-# Alternative: Llava (vision model)
-ollama pull llava
+# Alternative: Stable Diffusion 3
+ollama pull sd3
 ```
+
+#### Option B: Ollama Cloud (No local GPU needed)
+
+If you don't have a GPU, use Ollama Cloud API directly:
+
+```bash
+# Set environment variable to use cloud
+export OLLAMA_BASE_URL="https://api.ollama.ai"
+
+# Or edit server.py line 17:
+# OLLAMA_BASE = "https://api.ollama.ai"
+```
+
+Ollama Cloud provides access to models like `sdxl-turbo`, `sd3`, and more without local installation.
 
 ### 3. Install Python Dependencies
 
@@ -90,11 +106,17 @@ dpforge/
 ## Supported Models
 
 The app works with Ollama's image generation models:
-- `sdxl-turbo` - Recommended, fast and high quality
-- `sd3` - Stable Diffusion 3
-- `playwright` - Alternative model
 
-Make sure to pull the model before use:
+### Local Models
+- `sdxl-turbo` - Recommended, fast and high quality
+- `sd3` - Stable Diffusion 3 (larger, better quality)
+
+### Cloud Models (via Ollama Cloud)
+When using `OLLAMA_BASE_URL="https://api.ollama.ai"`:
+- All available image generation models
+- No local GPU required
+
+Make sure to pull local models before use:
 ```bash
 ollama pull sdxl-turbo
 ```
