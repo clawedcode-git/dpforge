@@ -59,11 +59,34 @@ python server.py
 
 #### Option C: Local Stable Diffusion (GPU Required)
 
-```bash
-# Requires CUDA GPU and significant VRAM (8GB+)
-export IMAGE_PROVIDER="local"
-python server.py
-```
+Requires a CUDA-compatible GPU with 8GB+ VRAM.
+
+**Setup:**
+
+1. **Install CUDA Toolkit** (if not already installed)
+   - Download from [NVIDIA CUDA Downloads](https://developer.nvidia.com/cuda-downloads)
+
+2. **Install PyTorch with CUDA support:**
+   ```bash
+   pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
+   ```
+
+3. **Run the app:**
+   ```bash
+   export IMAGE_PROVIDER="local"
+   python server.py
+   ```
+
+**Recommended Models:**
+- `stabilityai/stable-diffusion-xl-base-1.0` (default, good balance)
+- `stabilityai/sd-turbo` (faster, lower quality)
+
+Set model via: `export LOCAL_MODEL_ID="stabilityai/sd-turbo"`
+
+**Hardware Requirements:**
+- NVIDIA GPU with 8GB+ VRAM (RTX 3070 or better recommended)
+- 16GB+ RAM
+- 20GB+ disk space for models
 
 ### 3. Open in Browser
 
