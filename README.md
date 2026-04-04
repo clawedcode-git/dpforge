@@ -1,6 +1,6 @@
 # DpForge - Display Picture Forge
 
-Forge your perfect avatar in seconds. A local-first web application for generating display pictures using Ollama AI.
+Forge your perfect avatar in seconds. A web application for generating display pictures using AI image generation models.
 
 ![DpForge](https://img.shields.io/badge/DpForge-Avatar%20Generator-orange)
 ![Python](https://img.shields.io/badge/Python-3.9+-blue)
@@ -8,8 +8,8 @@ Forge your perfect avatar in seconds. A local-first web application for generati
 
 ## Features
 
-- **Local-First**: All processing happens on your machine using Ollama
-- **Privacy**: No data sent to external servers
+- **Multiple Backends**: Use HuggingFace API, Ollama, or local Stable Diffusion
+- **Free Tier Support**: Works with HuggingFace's free inference API
 - **Multiple Styles**: Realistic, Cartoon, Anime, and Abstract avatars
 - **Quick Prompts**: One-click suggestions for inspiration
 - **Instant Download**: Save your avatar in one click
@@ -17,60 +17,55 @@ Forge your perfect avatar in seconds. A local-first web application for generati
 ## Prerequisites
 
 1. **Python 3.9+**
-2. **Ollama** installed and running
-3. An image generation model (see below)
+2. An image generation provider (see below)
 
 ## Quick Start
 
-### 1. Install Ollama
-
-```bash
-# macOS/Linux
-curl -fsSL https://ollama.ai/install.sh | sh
-
-# Windows - Download from https://ollama.ai/download
-```
-
-### 2. Pull an Image Generation Model
-
-#### Option A: Local Models (Recommended for offline use)
-
-```bash
-# Recommended: SDXL Turbo (fast, high quality)
-ollama pull sdxl-turbo
-
-# Alternative: Stable Diffusion 3
-ollama pull sd3
-```
-
-#### Option B: Ollama Cloud (No local GPU needed)
-
-If you don't have a GPU, use Ollama Cloud API directly:
-
-```bash
-# Set environment variable to use cloud
-export OLLAMA_BASE_URL="https://api.ollama.ai"
-
-# Or edit server.py line 17:
-# OLLAMA_BASE = "https://api.ollama.ai"
-```
-
-Ollama Cloud provides access to models like `sdxl-turbo`, `sd3`, and more without local installation.
-
-### 3. Install Python Dependencies
+### 1. Install Python Dependencies
 
 ```bash
 cd dpforge
 pip install -r requirements.txt
 ```
 
-### 4. Run the Server
+### 2. Choose Your Image Generation Provider
+
+#### Option A: HuggingFace API (Recommended - Free Tier)
+
+1. Get a free token from [HuggingFace](https://huggingface.co/settings/tokens)
+2. Set the environment variable:
 
 ```bash
+export HF_TOKEN="your_token_here"
+export IMAGE_PROVIDER="huggingface"
 python server.py
 ```
 
-### 5. Open in Browser
+**Note**: Free tier has rate limits. Models may need to "warm up" on first use.
+
+#### Option B: Ollama (Local)
+
+```bash
+# Install Ollama (macOS/Linux)
+curl -fsSL https://ollama.ai/install.sh | sh
+
+# Pull a model
+ollama pull sdxl-turbo
+
+# Run with Ollama provider
+export IMAGE_PROVIDER="ollama"
+python server.py
+```
+
+#### Option C: Local Stable Diffusion (GPU Required)
+
+```bash
+# Requires CUDA GPU and significant VRAM (8GB+)
+export IMAGE_PROVIDER="local"
+python server.py
+```
+
+### 3. Open in Browser
 
 Navigate to: **http://localhost:8000**
 
@@ -101,47 +96,62 @@ dpforge/
 
 | Variable | Default | Description |
 |----------|---------|-------------|
+| `IMAGE_PROVIDER` | `huggingface` | Provider: `huggingface`, `ollama`, or `local` |
+| `HF_TOKEN` | - | HuggingFace API token (required for HuggingFace) |
 | `OLLAMA_BASE_URL` | `http://localhost:11434` | Ollama server URL |
+| `HF_MODEL` | `stabilityai/stable-diffusion-3-medium` | HuggingFace model ID |
 
-## Supported Models
+### Provider Comparison
 
-The app works with Ollama's image generation models:
+| Provider | Cost | Speed | Quality | Setup |
+|----------|------|-------|---------|-------|
+| HuggingFace API | Free tier | Medium | High | Easy |
+| Ollama | Free | Fast (local) | High | Medium |
+| Local SD | Free | Fast (GPU) | High | Complex |
 
-### Local Models
-- `sdxl-turbo` - Recommended, fast and high quality
-- `sd3` - Stable Diffusion 3 (larger, better quality)
+### Recommended HuggingFace Models
 
-### Cloud Models (via Ollama Cloud)
-When using `OLLAMA_BASE_URL="https://api.ollama.ai"`:
-- All available image generation models
-- No local GPU required
-
-Make sure to pull local models before use:
-```bash
-ollama pull sdxl-turbo
-```
+- `stabilityai/stable-diffusion-3-medium` - Latest, best quality
+- `stabilityai/stable-diffusion-xl-base-1.0` - Stable, reliable
 
 ## API Endpoints
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `GET /api/status` | GET | Check Ollama connection status |
+| `GET /api/status` | GET | Check provider connection status |
 | `POST /api/generate` | POST | Generate an avatar image |
 | `GET /api/image/{filename}` | GET | Retrieve generated image |
 
 ## Troubleshooting
 
-### "Ollama Offline" message
+### HuggingFace Issues
+
+**"Model is loading" error**
+- The model needs to warm up on first request
+- Wait 30-60 seconds and try again
+- Models stay loaded for a period after use
+
+**Rate limit reached**
+- Wait a few minutes
+- Consider upgrading to Pro tier
+
+### Ollama Issues
+
+**"Ollama Offline" message**
 - Make sure Ollama is running: `ollama serve`
 - Check if the model is pulled: `ollama list`
 
-### Generation fails
-- Ensure you have enough RAM (8GB+ recommended)
-- Try a smaller model like `sdxl-turbo`
+### Local Generation Issues
+
+**Out of memory**
+- Use a smaller model
+- Reduce image resolution
+- Ensure sufficient GPU VRAM (8GB+ recommended)
 
 ### Port already in use
+
 ```bash
-# Change port in server.py
+# Edit server.py line 152:
 uvicorn.run(app, host="0.0.0.0", port=8080)
 ```
 

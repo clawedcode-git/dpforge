@@ -19,20 +19,29 @@ let selectedStyle = 'realistic';
 let currentImageUrl = null;
 
 async function checkOllamaStatus() {
-    setStatus('loading', 'Checking Ollama...');
+    setStatus('loading', 'Checking...');
     try {
         const response = await fetch(`${API_BASE}/api/status`);
         const data = await response.json();
         
-        if (data.status === 'connected') {
-            setStatus('connected', 'Ollama Connected');
+        const providerName = {
+            'huggingface': 'HuggingFace',
+            'ollama': 'Ollama',
+            'local': 'Local SD'
+        }[data.provider] || data.provider;
+        
+        if (data.status === 'connected' || data.status === 'configured' || data.status === 'ready') {
+            setStatus('connected', `${providerName} Ready`);
             forgeBtn.disabled = false;
+        } else if (data.status === 'no_token') {
+            setStatus('disconnected', 'HF Token Required');
+            forgeBtn.disabled = true;
         } else {
-            setStatus('disconnected', 'Ollama Offline');
+            setStatus('disconnected', `${providerName} Offline`);
             forgeBtn.disabled = true;
         }
     } catch (error) {
-        setStatus('disconnected', 'Ollama Offline');
+        setStatus('disconnected', 'Server Offline');
         forgeBtn.disabled = true;
     }
 }
