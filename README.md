@@ -1,6 +1,6 @@
 # DpForge - Display Picture Forge
 
-Forge your perfect avatar in seconds. A web application for generating display pictures using AI image generation models.
+Forge your perfect avatar in seconds. A web application for generating display pictures using AI image generation.
 
 ![DpForge](https://img.shields.io/badge/DpForge-Avatar%20Generator-orange)
 ![Python](https://img.shields.io/badge/Python-3.9+-blue)
@@ -8,8 +8,7 @@ Forge your perfect avatar in seconds. A web application for generating display p
 
 ## Features
 
-- **Multiple Backends**: Use HuggingFace API, Ollama, or local Stable Diffusion
-- **Free Tier Support**: Works with HuggingFace's free inference API
+- **HuggingFace Inference**: Uses FLUX.1-schnell model via Inference Providers
 - **Multiple Styles**: Realistic, Cartoon, Anime, and Abstract avatars
 - **Quick Prompts**: One-click suggestions for inspiration
 - **Instant Download**: Save your avatar in one click
@@ -17,7 +16,7 @@ Forge your perfect avatar in seconds. A web application for generating display p
 ## Prerequisites
 
 1. **Python 3.9+**
-2. An image generation provider (see below)
+2. **HuggingFace account** with Inference Providers permission
 
 ## Quick Start
 
@@ -28,65 +27,16 @@ cd dpforge
 pip install -r requirements.txt
 ```
 
-### 2. Choose Your Image Generation Provider
+### 2. Setup HuggingFace
 
-#### Option A: HuggingFace API (Recommended - Free Tier)
-
-1. Get a free token from [HuggingFace](https://huggingface.co/settings/tokens)
-2. Set the environment variable:
+1. Get a token from [HuggingFace](https://huggingface.co/settings/tokens)
+2. Make sure the token has **"Inference Providers"** permission
+3. Set the environment variable:
 
 ```bash
 export HF_TOKEN="your_token_here"
-export IMAGE_PROVIDER="huggingface"
 python server.py
 ```
-
-**Note**: Free tier has rate limits. Models may need to "warm up" on first use.
-
-#### Option B: Ollama (Local)
-
-```bash
-# Install Ollama (macOS/Linux)
-curl -fsSL https://ollama.ai/install.sh | sh
-
-# Pull a model
-ollama pull sdxl-turbo
-
-# Run with Ollama provider
-export IMAGE_PROVIDER="ollama"
-python server.py
-```
-
-#### Option C: Local Stable Diffusion (GPU Required)
-
-Requires a CUDA-compatible GPU with 8GB+ VRAM.
-
-**Setup:**
-
-1. **Install CUDA Toolkit** (if not already installed)
-   - Download from [NVIDIA CUDA Downloads](https://developer.nvidia.com/cuda-downloads)
-
-2. **Install PyTorch with CUDA support:**
-   ```bash
-   pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
-   ```
-
-3. **Run the app:**
-   ```bash
-   export IMAGE_PROVIDER="local"
-   python server.py
-   ```
-
-**Recommended Models:**
-- `stabilityai/stable-diffusion-xl-base-1.0` (default, good balance)
-- `stabilityai/sd-turbo` (faster, lower quality)
-
-Set model via: `export LOCAL_MODEL_ID="stabilityai/sd-turbo"`
-
-**Hardware Requirements:**
-- NVIDIA GPU with 8GB+ VRAM (RTX 3070 or better recommended)
-- 16GB+ RAM
-- 20GB+ disk space for models
 
 ### 3. Open in Browser
 
@@ -105,7 +55,7 @@ Navigate to: **http://localhost:8000**
 dpforge/
 ├── server.py          # FastAPI backend server
 ├── requirements.txt   # Python dependencies
-├── SPEC.md           # Design specification
+├── AGENTS.md         # Developer documentation
 ├── README.md         # This file
 └── static/
     ├── index.html    # Main HTML page
@@ -119,23 +69,13 @@ dpforge/
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `IMAGE_PROVIDER` | `huggingface` | Provider: `huggingface`, `ollama`, or `local` |
-| `HF_TOKEN` | - | HuggingFace API token (required for HuggingFace) |
-| `OLLAMA_BASE_URL` | `http://localhost:11434` | Ollama server URL |
-| `HF_MODEL` | `stabilityai/stable-diffusion-3-medium` | HuggingFace model ID |
+| `HF_TOKEN` | - | HuggingFace API token (required) |
+| `HF_MODEL` | `black-forest-labs/FLUX.1-schnell` | HuggingFace model ID |
 
-### Provider Comparison
+### Available Models
 
-| Provider | Cost | Speed | Quality | Setup |
-|----------|------|-------|---------|-------|
-| HuggingFace API | Free tier | Medium | High | Easy |
-| Ollama | Free | Fast (local) | High | Medium |
-| Local SD | Free | Fast (GPU) | High | Complex |
-
-### Recommended HuggingFace Models
-
-- `stabilityai/stable-diffusion-3-medium` - Latest, best quality
-- `stabilityai/stable-diffusion-xl-base-1.0` - Stable, reliable
+- `black-forest-labs/FLUX.1-schnell` (default, fast)
+- `black-forest-labs/FLUX.1-dev` (higher quality, slower)
 
 ## API Endpoints
 
@@ -147,36 +87,22 @@ dpforge/
 
 ## Troubleshooting
 
-### HuggingFace Issues
+### "HF_TOKEN needs Inference Providers permission"
 
-**"Model is loading" error**
+1. Go to [HuggingFace Settings](https://huggingface.co/settings/tokens)
+2. Create a new token or edit an existing one
+3. Enable **"Inference Providers"** permission
+
+### "Model is loading" error
+
 - The model needs to warm up on first request
 - Wait 30-60 seconds and try again
 - Models stay loaded for a period after use
 
-**Rate limit reached**
+### Rate limit reached
+
 - Wait a few minutes
-- Consider upgrading to Pro tier
-
-### Ollama Issues
-
-**"Ollama Offline" message**
-- Make sure Ollama is running: `ollama serve`
-- Check if the model is pulled: `ollama list`
-
-### Local Generation Issues
-
-**Out of memory**
-- Use a smaller model
-- Reduce image resolution
-- Ensure sufficient GPU VRAM (8GB+ recommended)
-
-### Port already in use
-
-```bash
-# Edit server.py line 152:
-uvicorn.run(app, host="0.0.0.0", port=8080)
-```
+- HF free tier has rate limits
 
 ## License
 
