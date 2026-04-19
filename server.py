@@ -110,28 +110,21 @@ def generate_with_huggingface(prompt: str) -> bytes | None:
         raise Exception("HF_TOKEN required. Set the HF_TOKEN environment variable.")
     
     try:
-        import falav5
+        from huggingface_hub import InferenceClient
         
-        client = falav5.FalAV5(
-            api_key=HF_TOKEN
-        )
+        client = InferenceClient(provider="fal-ai", api_key=HF_TOKEN)
         
-        image = client.image_generation(
-            prompt=prompt,
-            model_id="black-forest-labs/FLUX.1-schnell"
-        )
+        model = os.getenv("HF_MODEL", "black-forest-labs/FLUX.1-schnell")
         
-        response = requests.get(image.images[0].url, timeout=60)
+        image = client.text_to_image(prompt, model=model)
         
-        if response.status_code == 200:
-            return response.content
-        raise Exception(f"Download failed: {response.status_code}")
+        img_bytes = io.BytesIO()
+        image.save(img_bytes, format="PNG")
+        return img_bytes.getvalue()
         
     except ImportError:
-        raise Exception("Install falav5: pip install falav5")
+        raise Exception("Install huggingface_hub: pip install huggingface_hub")
     except Exception as e:
-        if "401" in str(e) or "Unauthorized" in str(e):
-            raise Exception("HF_TOKEN needs 'Inference Providers' permission. Try using Ollama (local) instead - see AGENTS.md")
         raise Exception(f"HuggingFace error: {str(e)}")
 
 def generate_with_ollama(prompt: str) -> str | None:
