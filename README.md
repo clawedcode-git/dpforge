@@ -1,22 +1,21 @@
 # DpForge
 
-### Display Picture Forge
+**Display Picture Forge** — AI-powered avatar generator built with FastAPI and HuggingFace Inference Providers.
 
-Forge your perfect avatar in seconds using AI image generation.
+Generate unique, high-quality avatars from text descriptions in seconds.
 
 ---
 
 ## Features
 
-- **HuggingFace Inference** — FLUX.1-schnell model via Inference Providers
-- **Multiple Styles** — Realistic, Cartoon, Anime, and Abstract avatars
-- **Quick Prompts** — One-click suggestions for inspiration
-- **Instant Download** — Save your avatar in one click
+| Feature | Description |
+|---------|-------------|
+| **AI-Powered** | FLUX.1-schnell model for fast, high-quality generation |
+| **Multiple Styles** | Realistic, Cartoon, Anime, and Abstract |
+| **One-Click Download** | Instantly save PNG images |
+| **REST API** | Programmatic access via built-in endpoints |
 
-## Requirements
-
-- Python 3.9+
-- HuggingFace account with Inference Providers permission
+---
 
 ## Quick Start
 
@@ -31,14 +30,37 @@ export HF_TOKEN="your_token_here"
 python server.py
 ```
 
-Then open **http://localhost:8000** in your browser.
+Open **http://localhost:8000** in your browser.
 
-## Usage
+---
 
-1. Enter a description (e.g., "a wise owl", "space explorer")
-2. Select a style
-3. Click "Forge Avatar"
-4. Download your generated image
+## Configuration
+
+### Environment Variables
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `HF_TOKEN` | Yes | HuggingFace API token with Inference Providers permission |
+
+Get your token at [huggingface.co/settings/tokens](https://huggingface.co/settings/tokens). Ensure **"Inference Providers"** is enabled.
+
+---
+
+## API Reference
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/status` | GET | Check provider connection status |
+| `/api/generate` | POST | Generate an avatar from a prompt |
+| `/api/image/{filename}` | GET | Retrieve a generated image |
+
+### Generate Endpoint
+
+```bash
+curl -X POST http://localhost:8000/api/generate \
+  -H "Content-Type: application/json" \
+  -d '{"prompt": "a wise owl", "style": "realistic"}'
+```
 
 ---
 
@@ -47,50 +69,26 @@ Then open **http://localhost:8000** in your browser.
 ```
 dpforge/
 ├── server.py          # FastAPI backend
-├── requirements.txt  # Python dependencies
-├── AGENTS.md        # Developer docs
+├── requirements.txt   # Python dependencies
+├── AGENTS.md         # Developer documentation
 └── static/
     ├── index.html   # Frontend HTML
-    ├── styles.css  # Styling
+    ├── styles.css   # Styling
     └── app.js       # Frontend logic
 ```
 
 ---
 
-## Environment Variables
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `HF_TOKEN` | — | HuggingFace API token (required) |
-
----
-
-## API Endpoints
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `GET /api/status` | GET | Check provider connection |
-| `POST /api/generate` | POST | Generate an avatar |
-| `GET /api/image/{filename}` | GET | Retrieve generated image |
-
----
-
 ## Troubleshooting
 
-**Token permission error:**
-> Go to [HuggingFace Settings](https://huggingface.co/settings/tokens), create a new token, and enable **"Inference Providers"** permission.
+### 401 Unauthorized Error
+Your token lacks Inference Providers permission. Create a new token at [huggingface.co/settings/tokens](https://huggingface.co/settings/tokens) and enable the permission.
 
-**Model loading error:**
-> Wait 30-60 seconds on first request — the model needs to warm up.
+### Slow First Request
+The model requires 30-60 seconds to load on first request. Subsequent requests are faster.
 
 ---
 
 ## License
 
-MIT License
-
----
-
-## Contributing
-
-Open to contributions! Open issues or submit pull requests on [GitHub](https://github.com/clawedcode-git/dpforge).
+MIT License. See [LICENSE](LICENSE) for details.
