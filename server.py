@@ -104,28 +104,35 @@ STYLE_MODIFIERS = {
 }
 
 def generate_with_huggingface(prompt: str) -> bytes | None:
-    global HF_TOKEN, HF_API_URL
+    global HF_TOKEN
     
-    headers = {}
-    if HF_TOKEN:
-        headers["Authorization"] = f"Bearer {HF_TOKEN}"
+    if not HF_TOKEN:
+        raise Exception("HF_TOKEN required. Set the HF_TOKEN environment variable.")
     
-    model = os.getenv("HF_MODEL", "stabilityai/stable-diffusion-3-medium")
-    HF_API_URL = f"https://api-inference.huggingface.co/models/{model}"
-    
-    payload = {
-        "inputs": prompt,
-        "options": {"use_cache": False}
-    }
-    
-    response = requests.post(HF_API_URL, json=payload, headers=headers, timeout=180)
-    
-    if response.status_code == 200:
-        return response.content
-    elif response.status_code == 503:
-        raise Exception("Model is loading. Please wait and try again.")
-    else:
-        raise Exception(f"HuggingFace error: {response.status_code}")
+    try:
+        import falav5
+        
+        client = falav5.FalAV5(
+            api_key=HF_TOKEN
+        )
+        
+        image = client.image_generation(
+            prompt=prompt,
+            model_id="black-forest-labs/FLUX.1-schnell"
+        )
+        
+        response = requests.get(image.images[0].url, timeout=60)
+        
+        if response.status_code == 200:
+            return response.content
+        raise Exception(f"Download failed: {response.status_code}")
+        
+    except ImportError:
+        raise Exception("Install falav5: pip install falav5")
+    except Exception as e:
+        if "401" in str(e) or "Unauthorized" in str(e):
+            raise Exception("HF_TOKEN needs 'Inference Providers' permission. Try using Ollama (local) instead - see AGENTS.md")
+        raise Exception(f"HuggingFace error: {str(e)}")
 
 def generate_with_ollama(prompt: str) -> str | None:
     payload = {
@@ -215,6 +222,19 @@ async def get_image(filename: str):
 @app.get("/")
 async def root():
     return FileResponse("static/index.html")
+
+@app.get("/{file_path:path}")
+async def serve_static(file_path: str):
+    static_dir = Path("static")
+    file = static_dir / file_path
+    if file.exists() and file.is_file():
+        media_type = "text/html"
+        if file_path.endswith(".css"):
+            media_type = "text/css"
+        elif file_path.endswith(".js"):
+            media_type = "application/javascript"
+        return FileResponse(file, media_type=media_type)
+    return None
 
 if __name__ == "__main__":
     print(f"\n{'='*40}")
