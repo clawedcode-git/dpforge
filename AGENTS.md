@@ -9,33 +9,18 @@ Opens at http://localhost:8000
 
 ## Required environment variables
 
-| Variable | Provider | Description |
-|---------|---------|-------------|
-| `HF_TOKEN` | huggingface | HuggingFace API token (get from huggingface.co/settings/tokens) |
-| `IMAGE_PROVIDER` | all | `huggingface` (default), `ollama`, or `local` |
+| Variable | Description |
+|---------|-------------|
+| `HF_TOKEN` | HuggingFace API token with "Inference Providers" permission (get from huggingface.co/settings/tokens) |
 
-## Provider-specific setup
+## Setup
 
-### HuggingFace (default, free tier)
 ```bash
 export HF_TOKEN="your_token"
-export IMAGE_PROVIDER="huggingface"
 python server.py
 ```
 
-### Ollama (local)
-```bash
-ollama pull sdxl-turbo
-export IMAGE_PROVIDER="ollama"
-python server.py
-```
-
-### Local Stable Diffusion (GPU required, 8GB+ VRAM)
-```bash
-pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
-export IMAGE_PROVIDER="local"
-python server.py
-```
+**Note:** Token must have "Inference Providers" permission enabled in your HuggingFace account settings.
 
 ## Project structure
 
@@ -51,6 +36,7 @@ python server.py
 
 ## Notes
 
-- First HuggingFace request may be slow (model "warmup")
-- Free tier has rate limits
+- Uses HuggingFace Inference Providers (fal-ai backend) for image generation
+- Uses black-forest-labs/FLUX.1-schnell model
+- First request may be slow (model warmup)
 - Output images saved to `generated/` with unique filenames
