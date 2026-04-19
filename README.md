@@ -1,113 +1,96 @@
-# DpForge - Display Picture Forge
+# DpForge
 
-Forge your perfect avatar in seconds. A web application for generating display pictures using AI image generation.
+### Display Picture Forge
 
-![DpForge](https://img.shields.io/badge/DpForge-Avatar%20Generator-orange)
-![Python](https://img.shields.io/badge/Python-3.9+-blue)
-![License](https://img.shields.io/badge/License-MIT-green)
+Forge your perfect avatar in seconds using AI image generation.
+
+---
 
 ## Features
 
-- **HuggingFace Inference**: Uses FLUX.1-schnell model via Inference Providers
-- **Multiple Styles**: Realistic, Cartoon, Anime, and Abstract avatars
-- **Quick Prompts**: One-click suggestions for inspiration
-- **Instant Download**: Save your avatar in one click
+- **HuggingFace Inference** — FLUX.1-schnell model via Inference Providers
+- **Multiple Styles** — Realistic, Cartoon, Anime, and Abstract avatars
+- **Quick Prompts** — One-click suggestions for inspiration
+- **Instant Download** — Save your avatar in one click
 
-## Prerequisites
+## Requirements
 
-1. **Python 3.9+**
-2. **HuggingFace account** with Inference Providers permission
+- Python 3.9+
+- HuggingFace account with Inference Providers permission
 
 ## Quick Start
 
-### 1. Install Python Dependencies
-
 ```bash
-cd dpforge
+# 1. Install dependencies
 pip install -r requirements.txt
-```
 
-### 2. Setup HuggingFace
-
-1. Get a token from [HuggingFace](https://huggingface.co/settings/tokens)
-2. Make sure the token has **"Inference Providers"** permission
-3. Set the environment variable:
-
-```bash
+# 2. Set your HuggingFace token
 export HF_TOKEN="your_token_here"
+
+# 3. Run the server
 python server.py
 ```
 
-### 3. Open in Browser
-
-Navigate to: **http://localhost:8000**
+Then open **http://localhost:8000** in your browser.
 
 ## Usage
 
-1. Enter a description of your desired avatar (e.g., "a wise owl", "space explorer")
-2. Select a style (Realistic, Cartoon, Anime, or Abstract)
+1. Enter a description (e.g., "a wise owl", "space explorer")
+2. Select a style
 3. Click "Forge Avatar"
-4. Download your generated image!
+4. Download your generated image
+
+---
 
 ## Project Structure
 
 ```
 dpforge/
-├── server.py          # FastAPI backend server
-├── requirements.txt   # Python dependencies
-├── AGENTS.md         # Developer documentation
-├── README.md         # This file
+├── server.py          # FastAPI backend
+├── requirements.txt  # Python dependencies
+├── AGENTS.md        # Developer docs
 └── static/
-    ├── index.html    # Main HTML page
-    ├── styles.css    # Styling
-    └── app.js        # Frontend logic
+    ├── index.html   # Frontend HTML
+    ├── styles.css  # Styling
+    └── app.js       # Frontend logic
 ```
 
-## Configuration
+---
 
-### Environment Variables
+## Environment Variables
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `HF_TOKEN` | - | HuggingFace API token (required) |
-| `HF_MODEL` | `black-forest-labs/FLUX.1-schnell` | HuggingFace model ID |
+| `HF_TOKEN` | — | HuggingFace API token (required) |
 
-### Available Models
-
-- `black-forest-labs/FLUX.1-schnell` (default, fast)
-- `black-forest-labs/FLUX.1-dev` (higher quality, slower)
+---
 
 ## API Endpoints
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `GET /api/status` | GET | Check provider connection status |
-| `POST /api/generate` | POST | Generate an avatar image |
+| `GET /api/status` | GET | Check provider connection |
+| `POST /api/generate` | POST | Generate an avatar |
 | `GET /api/image/{filename}` | GET | Retrieve generated image |
+
+---
 
 ## Troubleshooting
 
-### "HF_TOKEN needs Inference Providers permission"
+**Token permission error:**
+> Go to [HuggingFace Settings](https://huggingface.co/settings/tokens), create a new token, and enable **"Inference Providers"** permission.
 
-1. Go to [HuggingFace Settings](https://huggingface.co/settings/tokens)
-2. Create a new token or edit an existing one
-3. Enable **"Inference Providers"** permission
+**Model loading error:**
+> Wait 30-60 seconds on first request — the model needs to warm up.
 
-### "Model is loading" error
-
-- The model needs to warm up on first request
-- Wait 30-60 seconds and try again
-- Models stay loaded for a period after use
-
-### Rate limit reached
-
-- Wait a few minutes
-- HF free tier has rate limits
+---
 
 ## License
 
-MIT License - feel free to use and modify!
+MIT License
+
+---
 
 ## Contributing
 
-Contributions welcome! Feel free to submit issues and pull requests.
+Open to contributions! Open issues or submit pull requests on [GitHub](https://github.com/clawedcode-git/dpforge).
